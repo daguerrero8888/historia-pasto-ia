@@ -1,28 +1,33 @@
-const express = require("express");
+const express = require('express');
+const cors = require('cors');
 const app = express();
-const cors = require("cors");
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.static("public"));
 
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/public/index.html");
+// Hechos históricos simulados por fecha
+const hechos = {
+    "01-01": ["Fundación de Pasto en 1537"],
+    "06-24": ["El 24 de junio de 1824 se defendió la ciudad de una invasión", "El Carnaval de Negros y Blancos fue declarado Patrimonio Oral en esta fecha"],
+    "12-31": ["Última batalla independentista en Pasto, 1822"]
+};
+
+// Función para generar IA simulada
+function generarHechoIA(fecha) {
+    const ejemplos = hechos[fecha] || [`El ${fecha}, Pasto vivió un evento importante que marcó su historia.`];
+    return {
+        fecha: `Hoy es ${fecha}`,
+        eventos: ejemplos
+    };
+}
+
+app.get('/hoy', (req, res) => {
+    const hoy = new Date();
+    const key = hoy.toISOString().slice(5, 10); // MM-DD
+    const hecho = generarHechoIA(key);
+    res.json(hecho);
 });
 
-app.get("/hoy", (req, res) => {
-  const fecha = new Date().toLocaleDateString("es-CO", { day: "numeric", month: "long" });
-  res.json({
-    fecha,
-    eventos: [
-      "📜 En un día como hoy se celebró una comparsa en el barrio San Ignacio.",
-      "🎭 Participación destacada de la IEM Ciudad de Pasto en el desfile estudiantil.",
-      "🎶 El colectivo coreográfico realizó una presentación cultural en la plaza de Nariño.",
-      "📚 Se conmemora la creación del archivo histórico municipal de Pasto."
-    ]
-  });
-});
-
-app.listen(port, () => {
-  console.log(`Servidor ejecutándose en http://localhost:${port}`);
+app.listen(PORT, () => {
+    console.log(`Servidor escuchando en http://localhost:${PORT}`);
 });

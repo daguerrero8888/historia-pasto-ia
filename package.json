@@ -1,7 +1,7 @@
 {
-  "name": "historia-pasto-ia",
+  "name": "historia-pasto-ia-backend",
   "version": "1.0.0",
-  "description": "Eventos históricos en Pasto generados por IA",
+  "description": "Backend IA para mostrar hechos históricos diarios de Pasto",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
