@@ -19,7 +19,6 @@ app.get("/api/hechos-hoy", async (req, res) => {
   const dia = hoy.getDate();
   const mes = hoy.toLocaleString("es-ES", { month: "long" }).toLowerCase();
   const fecha = `${dia}_de_${mes}`;
-
   const url = getWikipediaURL(fecha);
 
   try {
