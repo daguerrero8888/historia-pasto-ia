@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Un día como hoy - Historia de Pasto</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2em;
+      background-color: #f0f4f7;
+      text-align: center;
+    }
+    h1 {
+      color: #2e7d32;
+    }
+    .hechos {
+      max-width: 800px;
+      margin: auto;
+      text-align: left;
+      background: #fff;
+      padding: 1em;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .hecho {
+      margin-bottom: 0.75em;
+    }
+    .logo {
+      width: 100px;
+      margin-bottom: 1em;
+    }
+  </style>
+</head>
+<body>
+  <img src="Logo.png" alt="Logo" class="logo" />
+  <h1>📜 Un día como hoy</h1>
+  <div id="fecha"></div>
+  <div class="hechos" id="hechos">
+    Cargando hechos históricos...
+  </div>
+
+  <script>
+    fetch("https://historia-pasto-ia.onrender.com/api/hechos-hoy")
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("fecha").innerText = `🗓️ ${data.fecha.replace(/_/g, ' ')}`;
+        document.getElementById("hechos").innerHTML = data.hechos.slice(0, 10).map(h =>
+          `<div class="hecho">📌 ${h}</div>`
+        ).join("");
+      })
+      .catch(() => {
+        document.getElementById("hechos").innerText = "No se pudieron cargar los hechos históricos.";
+      });
+  </script>
+</body>
+</html>
