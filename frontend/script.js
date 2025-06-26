@@ -1,4 +1,4 @@
-fetch('https://TU-BACKEND-EN-RENDER/api/hecho-hoy')
+fetch('https://historia-backend-ervf.onrender.com')
   .then(res => res.json())
   .then(data => {
     document.getElementById('titulo').textContent = data.titulo;
