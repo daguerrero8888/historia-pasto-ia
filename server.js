@@ -9,33 +9,44 @@ app.use(cors());
 const PORT = process.env.PORT || 3000;
 
 app.get('/api/hecho-hoy', async (req, res) => {
-  const hoy = moment().format('YYYY/MM/DD');
-  const url = `https://api.wikimedia.org/feed/v1/wikipedia/es/featured/${hoy}`;
+  const fecha = moment();
+  const mes = fecha.month() + 1; // month() es 0-based
+  const dia = fecha.date();
 
   try {
+    const url = `https://es.wikipedia.org/api/rest_v1/feed/onthisday/events/${mes}/${dia}`;
     const r = await axios.get(url, {
-      headers: { 'User-Agent': 'HistoriaPasto/1.0 (email@ejemplo.com)' }
+      headers: { 'User-Agent': 'HistoriaPasto/1.0 (ejemplo@correo.com)' }
     });
-    const eventos = r.data.events || [];
-    const hecho = eventos[0] || null;
-    if (!hecho) {
-      return res.status(404).json({ titulo: "No hay hechos hoy", descripcion: "", fuente: "" });
+
+    const eventos = r.data?.events || [];
+    if (eventos.length === 0) {
+      return res.status(404).json({
+        titulo: "No hay hechos hoy",
+        descripcion: "",
+        fuente: ""
+      });
     }
+
+    const evento = eventos[Math.floor(Math.random() * eventos.length)];
+    const descripcion = evento.text;
+    const fuente = evento.pages?.[0]?.content_urls?.desktop?.page || "https://es.wikipedia.org";
+
     res.json({
-      titulo: hecho.text,
-      descripcion: hecho.pages?.[0]?.extract || "",
-      fuente: hecho.pages?.[0]?.content_urls?.desktop?.page || `https://es.wikipedia.org/wiki/${hecho.pages?.[0]?.title}`
+      titulo: "Hecho histórico del día",
+      descripcion,
+      fuente
     });
   } catch (error) {
-    console.error("Error Wikimedia:", error.message);
+    console.error("Error Wikipedia:", error.message);
     res.status(500).json({
       titulo: "Error al obtener hecho histórico",
-      descripcion: "No se pudo consultar Wikipedia.",
+      descripcion: "No se pudo consultar la API de Wikipedia.",
       fuente: ""
     });
   }
 });
 
 app.listen(PORT, () => {
-  console.log("Servidor HistoriaPasto corrriendo en puerto", PORT);
+  console.log("Servidor Wikipedia corriendo en puerto", PORT);
 });
