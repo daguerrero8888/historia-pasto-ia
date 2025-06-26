@@ -15,7 +15,7 @@ app.get('/api/hecho-hoy', async (req, res) => {
 
   try {
     const respuesta = await axios.post('https://api.openai.com/v1/chat/completions', {
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-3.5-turbo-0613'
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7
     }, {
