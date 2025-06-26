@@ -9,31 +9,33 @@ app.use(cors());
 const PORT = process.env.PORT || 3000;
 
 app.get('/api/hecho-hoy', async (req, res) => {
-  const hoy = moment().format('MMMM D'); // Ej: June 25
-  const pregunta = `Dame un hecho histórico importante que haya ocurrido en Colombia un ${hoy}, en máximo 40 palabras.`;
+  const hoy = moment().format('YYYY/MM/DD');
+  const url = `https://api.wikimedia.org/feed/v1/wikipedia/es/featured/${hoy}`;
 
   try {
-    const respuesta = await axios.post(
-      'https://api-inference.huggingface.co/models/bigcode/tiny_stories',
-      { inputs: pregunta }
-    );
-
-    const texto = respuesta.data?.[0]?.generated_text || "No se encontró un hecho histórico.";
+    const r = await axios.get(url, {
+      headers: { 'User-Agent': 'HistoriaPasto/1.0 (email@ejemplo.com)' }
+    });
+    const eventos = r.data.events || [];
+    const hecho = eventos[0] || null;
+    if (!hecho) {
+      return res.status(404).json({ titulo: "No hay hechos hoy", descripcion: "", fuente: "" });
+    }
     res.json({
-      titulo: "Hecho histórico del día",
-      descripcion: texto,
-      fuente: "https://es.wikipedia.org/wiki/Colombia"
+      titulo: hecho.text,
+      descripcion: hecho.pages?.[0]?.extract || "",
+      fuente: hecho.pages?.[0]?.content_urls?.desktop?.page || `https://es.wikipedia.org/wiki/${hecho.pages?.[0]?.title}`
     });
   } catch (error) {
-    console.error("Error Hugging Face:", error.response?.data || error.message);
+    console.error("Error Wikimedia:", error.message);
     res.status(500).json({
       titulo: "Error al obtener hecho histórico",
-      descripcion: "No se pudo generar el dato con IA.",
+      descripcion: "No se pudo consultar Wikipedia.",
       fuente: ""
     });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor final HuggingFace público corriendo en puerto ${PORT}`);
+  console.log("Servidor HistoriaPasto corrriendo en puerto", PORT);
 });
